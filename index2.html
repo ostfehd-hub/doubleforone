@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Double For One — Créez votre double</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --white: #FFFFFF;
+      --bg: #F9FAFB;
+      --border: #E5E7EB;
+      --text: #111827;
+      --mid: #374151;
+      --muted: #9CA3AF;
+      --green: #16A34A;
+      --green-light: #DCFCE7;
+      --green-border: #86EFAC;
+      --red: #EF4444;
+      --red-light: #FEE2E2;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── SCREENS ── */
+    .screen {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 20px;
+      animation: fadeIn 0.3s ease;
+    }
+    .screen.active { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── NAV ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .logo span { color: var(--green); }
+
+    .step-counter {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    /* ── TYPOGRAPHY ── */
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: white;
+      width: 100%;
+    }
+    .btn-primary:hover { background: #15803D; transform: translateY(-1px); }
+    .btn-primary:disabled { background: var(--muted); cursor: not-allowed; transform: none; }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--mid);
+      font-size: 13px;
+    }
+    .btn-outline:hover { background: var(--bg); }
+
+    /* ── SCREEN 0: WELCOME ── */
+    #s0 .card { text-align: center; }
+    #s0 .icon-big { font-size: 48px; margin-bottom: 20px; }
+
+    .legal-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin: 20px 0 24px;
+      text-align: left;
+    }
+
+    .legal-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 13px;
+      color: var(--mid);
+      line-height: 1.5;
+    }
+
+    .legal-item input[type="checkbox"] {
+      margin-top: 2px;
+      width: 15px;
+      height: 15px;
+      accent-color: var(--green);
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    /* ── SCREEN 1: SECTOR ── */
+    #s1 { justify-content: flex-start; padding-top: 32px; }
+    #s1 .inner { width: 100%; max-width: 560px; }
+
+    .sector-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .sector-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sector-card:hover {
+      border-color: var(--green);
+      background: var(--green-light);
+    }
+
+    .sector-card.selected {
+      border-color: var(--green);
+      background: var(--green-light);
+    }
+
+    .sector-emoji { font-size: 28px; line-height: 1; }
+
+    .sector-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .sector-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ── SCREEN 2: BRIEFING ── */
+    #s2 .card { text-align: center; }
+
+    .steps-list {
+      text-align: left;
+      margin: 20px 0 28px;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step-item:last-child { border-bottom: none; }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      background: var(--green-light);
+      border: 1px solid var(--green-border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--green);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-text { font-size: 13px; color: var(--mid); line-height: 1.5; }
+    .step-text b { color: var(--text); font-weight: 600; }
+
+    .tip-box {
+      background: #FFF7ED;
+      border: 1px solid #FED7AA;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #92400E;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    /* ── SCREEN 3: SESSION ── */
+    #s3 { justify-content: flex-start; padding-top: 0; padding-left: 0; padding-right: 0; }
+
+    .session-header {
+      width: 100%;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+    }
+
+    .progress-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .progress-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+
+    .progress-count {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    .progress-bar {
+      height: 4px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 99px;
+      transition: width 0.5s ease;
+    }
+
+    .session-body {
+      flex: 1;
+      width: 100%;
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* CUSTOMER BUBBLE */
+    .customer-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      animation: slideIn 0.35s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .customer-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .customer-avatar {
+      width: 44px;
+      height: 44px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .customer-name { font-size: 13px; font-weight: 600; color: var(--text); }
+    .customer-role { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .customer-badge {
+      margin-left: auto;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .question-text {
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.5;
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 10px;
+      border-left: 3px solid var(--border);
+    }
+
+    /* RECORDING AREA */
+    .record-area {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .record-hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .record-btn {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: none;
+      background: var(--green);
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      position: relative;
+    }
+
+    .record-btn.recording {
+      background: var(--red);
+      animation: pulse-ring 1.5s infinite;
+    }
+
+    @keyframes pulse-ring {
+      0%   { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+      70%  { box-shadow: 0 0 0 14px rgba(239,68,68,0); }
+      100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    }
+
+    .record-status {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .record-status.active { color: var(--red); }
+
+    .record-timer {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-variant-numeric: tabular-nums;
+      min-height: 16px;
+    }
+
+    .answer-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn-next {
+      flex: 1;
+      background: var(--green);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: none;
+    }
+
+    .btn-next:hover { background: #15803D; }
+    .btn-next.visible { display: block; animation: fadeIn 0.2s ease; }
+
+    /* CLONE PROGRESS */
+    .clone-bar {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .clone-icon { font-size: 16px; }
+    .clone-text { font-size: 12px; color: var(--mid); flex: 1; }
+    .clone-pct { font-size: 12px; font-weight: 700; color: var(--green); }
+
+    .clone-mini-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .clone-mini-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 99px;
+      transition: width 0.5s ease;
+    }
+
+    /* ── SCREEN 4: PROCESSING ── */
+    #s4 .card { text-align: center; }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 24px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .processing-steps {
+      text-align: left;
+      margin: 24px 0;
+    }
+
+    .proc-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      font-size: 13px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      transition: color 0.3s;
+    }
+
+    .proc-step:last-child { border-bottom: none; }
+    .proc-step.done { color: var(--green); }
+    .proc-step.active { color: var(--text); font-weight: 600; }
+
+    .proc-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    /* ── SCREEN 5: REVEAL ── */
+    #s5 .card { text-align: center; }
+
+    .reveal-icon {
+      width: 72px;
+      height: 72px;
+      background: var(--green-light);
+      border: 2px solid var(--green-border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 20px;
+    }
+
+    .play-btn {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      width: 100%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      transition: all 0.15s;
+    }
+
+    .play-btn:hover { border-color: var(--green); background: var(--green-light); }
+
+    .play-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .play-info { text-align: left; }
+    .play-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .play-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .waveform-mini {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-left: auto;
+    }
+
+    .wm-bar {
+      width: 3px;
+      border-radius: 2px;
+      background: var(--green);
+      animation: wm 0.8s ease-in-out infinite alternate;
+    }
+
+    .wm-bar:nth-child(1) { height: 8px;  animation-delay: 0s; }
+    .wm-bar:nth-child(2) { height: 16px; animation-delay: 0.1s; }
+    .wm-bar:nth-child(3) { height: 12px; animation-delay: 0.2s; }
+    .wm-bar:nth-child(4) { height: 20px; animation-delay: 0.15s; }
+    .wm-bar:nth-child(5) { height: 10px; animation-delay: 0.05s; }
+    .wm-bar:nth-child(6) { height: 14px; animation-delay: 0.25s; }
+
+    @keyframes wm {
+      from { opacity: 0.3; transform: scaleY(0.5); }
+      to   { opacity: 1;   transform: scaleY(1); }
+    }
+
+    .price-reveal {
+      background: var(--green-light);
+      border: 1px solid var(--green-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 16px 0 24px;
+    }
+
+    .price-reveal .big { font-size: 36px; font-weight: 700; color: var(--green); letter-spacing: -1px; }
+    .price-reveal .per { font-size: 13px; color: #166534; margin-top: 2px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .card { padding: 28px 20px; }
+      .sector-grid { grid-template-columns: 1fr; }
+      .title { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Double<span>For</span>One</div>
+  <div class="step-counter" id="step-counter">Étape 1 / 5</div>
+</div>
+
+<!-- ── SCREEN 0: CONSENT ── -->
+<div class="screen active" id="s0">
+  <div class="card">
+    <div class="icon-big">🎙️</div>
+    <h1 class="title">Créez votre double vocal</h1>
+    <p class="subtitle">Avant de commencer, nous avons besoin de votre accord pour cloner votre voix en toute légalité.</p>
+
+    <div class="legal-box">
+      <div class="legal-item">
+        <input type="checkbox" id="c1" onchange="checkConsent()">
+        <label for="c1">J'accepte que Double For One clone ma voix pour répondre aux appels entrants de mon commerce.</label>
+      </div>
+      <div class="legal-item">
+        <input type="checkbox" id="c2" onchange="checkConsent()">
+        <label for="c2">Je comprends que mon assistant vocal précisera qu'il est un assistant virtuel lors des appels.</label>
+      </div>
+      <div class="legal-item">
+        <input type="checkbox" id="c3" onchange="checkConsent()">
+        <label for="c3">J'accepte les conditions d'utilisation et la politique de confidentialité.</label>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="consent-btn" onclick="goTo(1)" disabled>
+      Continuer →
+    </button>
+  </div>
+</div>
+
+<!-- ── SCREEN 1: SECTOR ── -->
+<div class="screen" id="s1">
+  <div class="inner">
+    <h1 class="title">Quel est votre commerce ?</h1>
+    <p class="subtitle">Vos questions seront adaptées à votre secteur pour un clone parfait.</p>
+
+    <div class="sector-grid" id="sector-grid">
+      <div class="sector-card" onclick="selectSector('coiffeur', this)">
+        <div class="sector-emoji">✂️</div>
+        <div>
+          <div class="sector-label">Coiffeur / Salon</div>
+          <div class="sector-sub">Coupe, couleur, soins</div>
+        </div>
+      </div>
+      <div class="sector-card" onclick="selectSector('restaurant', this)">
+        <div class="sector-emoji">🍽️</div>
+        <div>
+          <div class="sector-label">Restaurant</div>
+          <div class="sector-sub">Réservations, menus</div>
+        </div>
+      </div>
+      <div class="sector-card" onclick="selectSector('plombier', this)">
+        <div class="sector-emoji">🔧</div>
+        <div>
+          <div class="sector-label">Plombier / Artisan</div>
+          <div class="sector-sub">Urgences, devis</div>
+        </div>
+      </div>
+      <div class="sector-card" onclick="selectSector('dentiste', this)">
+        <div class="sector-emoji">🦷</div>
+        <div>
+          <div class="sector-label">Cabinet dentaire</div>
+          <div class="sector-sub">Rendez-vous, soins</div>
+        </div>
+      </div>
+      <div class="sector-card" onclick="selectSector('immobilier', this)">
+        <div class="sector-emoji">🏠</div>
+        <div>
+          <div class="sector-label">Agent immobilier</div>
+          <div class="sector-sub">Vente, location</div>
+        </div>
+      </div>
+      <div class="sector-card" onclick="selectSector('esthetique', this)">
+        <div class="sector-emoji">💅</div>
+        <div>
+          <div class="sector-label">Esthétique / Spa</div>
+          <div class="sector-sub">Soins, épilation</div>
+        </div>
+      </div>
+    </div>
+
+    <br>
+    <button class="btn btn-primary" id="sector-btn" onclick="goTo(2)" disabled>
+      Continuer →
+    </button>
+  </div>
+</div>
+
+<!-- ── SCREEN 2: BRIEFING ── -->
+<div class="screen" id="s2">
+  <div class="card">
+    <h1 class="title">Comment ça marche 🎯</h1>
+    <p class="subtitle">Dans quelques instants, de faux clients vont vous poser des questions. Répondez naturellement.</p>
+
+    <div class="steps-list">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-text"><b>Un client arrive</b> — il vous pose une question comme s'il appelait votre commerce.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-text"><b>Appuyez sur le micro</b> — répondez comme vous le feriez normalement. Avec vos mots, votre humour, votre style.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-text"><b>Passez au suivant</b> — 15 clients au total. Environ 20 minutes.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-text"><b>Votre double est créé</b> — vous l'entendez avant de payer quoi que ce soit.</div>
+      </div>
+    </div>
+
+    <div class="tip-box">
+      💡 <b>Conseil :</b> Mettez-vous dans un endroit calme. Parlez comme si le client était vraiment au téléphone.
+    </div>
+
+    <button class="btn btn-primary" onclick="startSession()">
+      C'est parti 🎙️
+    </button>
+  </div>
+</div>
+
+<!-- ── SCREEN 3: SESSION ── -->
+<div class="screen" id="s3">
+  <div class="session-header">
+    <div class="progress-row">
+      <span class="progress-label">CRÉATION DU CLONE</span>
+      <span class="progress-count" id="q-counter">Question 1 / 15</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <div class="session-body">
+    <!-- Customer card -->
+    <div class="customer-card" id="customer-card">
+      <div class="customer-header">
+        <div class="customer-avatar" id="c-avatar">👩</div>
+        <div>
+          <div class="customer-name" id="c-name">Marie, 34 ans</div>
+          <div class="customer-role">Client potentiel</div>
+        </div>
+        <div class="customer-badge">📞 En ligne</div>
+      </div>
+      <div class="question-text" id="q-text">"Bonjour, vous êtes ouverts le dimanche ?"</div>
+    </div>
+
+    <!-- Recording area -->
+    <div class="record-area">
+      <p class="record-hint">Appuyez sur le micro pour répondre</p>
+      <button class="record-btn" id="record-btn" onclick="toggleRecord()">🎙️</button>
+      <div class="record-status" id="record-status">Prêt à enregistrer</div>
+      <div class="record-timer" id="record-timer"></div>
+
+      <div class="answer-actions">
+        <button class="btn btn-outline" onclick="skipQuestion()">Passer →</button>
+        <button class="btn-next" id="btn-next" onclick="nextQuestion()">Réponse enregistrée ✓ Suivant →</button>
+      </div>
+    </div>
+
+    <!-- Clone building progress -->
+    <div class="clone-bar">
+      <div class="clone-icon">🧠</div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span class="clone-text">Votre clone se construit en temps réel</span>
+          <span class="clone-pct" id="clone-pct">0%</span>
+        </div>
+        <div class="clone-mini-bar">
+          <div class="clone-mini-fill" id="clone-mini-fill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCREEN 4: PROCESSING ── -->
+<div class="screen" id="s4">
+  <div class="card">
+    <div class="spinner"></div>
+    <h1 class="title">Création de votre double…</h1>
+    <p class="subtitle">Notre IA analyse vos réponses et génère votre clone vocal. Ça prend environ 30 secondes.</p>
+
+    <div class="processing-steps" id="proc-steps">
+      <div class="proc-step active" id="p1"><span class="proc-icon">🎙️</span> Analyse de votre voix</div>
+      <div class="proc-step" id="p2"><span class="proc-icon">🧠</span> Construction de la personnalité</div>
+      <div class="proc-step" id="p3"><span class="proc-icon">📚</span> Intégration des connaissances</div>
+      <div class="proc-step" id="p4"><span class="proc-icon">✅</span> Finalisation du clone</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCREEN 5: REVEAL ── -->
+<div class="screen" id="s5">
+  <div class="card">
+    <div class="reveal-icon">🎭</div>
+    <h1 class="title">Votre double est prêt.</h1>
+    <p class="subtitle">Écoutez comment votre double répondra à vos clients — avant de payer quoi que ce soit.</p>
+
+    <div class="play-btn" onclick="playDemo()">
+      <div class="play-icon">▶</div>
+      <div class="play-info">
+        <div class="play-title">Écouter votre double</div>
+        <div class="play-sub">Simulation d'un appel client — votre voix</div>
+      </div>
+      <div class="waveform-mini">
+        <div class="wm-bar"></div>
+        <div class="wm-bar"></div>
+        <div class="wm-bar"></div>
+        <div class="wm-bar"></div>
+        <div class="wm-bar"></div>
+        <div class="wm-bar"></div>
+      </div>
+    </div>
+
+    <div class="price-reveal">
+      <div class="big">1 $</div>
+      <div class="per">par jour · Annulable à tout moment · Votre voix pour toujours</div>
+    </div>
+
+    <button class="btn btn-primary" onclick="alert('Fonctionnalité de paiement à connecter avec Stripe !')">
+      Activer mon double — $1/jour
+    </button>
+
+    <br><br>
+    <button class="btn btn-outline" style="width:100%" onclick="goTo(0)">
+      Recommencer la session
+    </button>
+  </div>
+</div>
+
+<script>
+  /* ── DATA ── */
+  const questions = {
+    coiffeur: [
+      { name: 'Marie, 34 ans', avatar: '👩', q: '"Bonjour, vous êtes ouverts le dimanche ?"' },
+      { name: 'Karim, 28 ans', avatar: '👨', q: '"C\'est combien pour une coupe homme ?"' },
+      { name: 'Sophie, 45 ans', avatar: '👩‍🦱', q: '"Est-ce que vous faites les colorations ?"' },
+      { name: 'Lucas, 22 ans', avatar: '👦', q: '"J\'ai besoin d\'un rendez-vous aujourd\'hui, c\'est possible ?"' },
+      { name: 'Fatima, 38 ans', avatar: '👩‍🦳', q: '"Vous faites les lissages brésiliens ?"' },
+      { name: 'Thomas, 55 ans', avatar: '👨‍🦲', q: '"C\'est combien la coupe + barbe ?"' },
+      { name: 'Julie, 29 ans', avatar: '👩‍🦰', q: '"Vous faites les balayages ? C\'est combien à peu près ?"' },
+      { name: 'Ahmed, 41 ans', avatar: '🧔', q: '"Vous acceptez les cartes bancaires ?"' },
+      { name: 'Camille, 16 ans', avatar: '🧒', q: '"Mes parents veulent savoir si vous coupez les cheveux des ados ?"' },
+      { name: 'Nathalie, 52 ans', avatar: '👩‍🦳', q: '"Quels sont vos horaires du lundi au vendredi ?"' },
+      { name: 'Ryan, 25 ans', avatar: '👨', q: '"Je dois prendre rendez-vous ou je peux venir directement ?"' },
+      { name: 'Isabelle, 36 ans', avatar: '👩', q: '"Vous utilisez des produits naturels ?"' },
+      { name: 'Marc, 48 ans', avatar: '👨‍🦱', q: '"Il y a du parking à côté de chez vous ?"' },
+      { name: 'Léa, 31 ans', avatar: '👩‍🦱', q: '"Vous faites les extensions capillaires ?"' },
+      { name: 'Daniel, 67 ans', avatar: '👴', q: '"Combien coûte une permanente pour ma femme ?"' },
+    ],
+    restaurant: [
+      { name: 'Sarah, 29 ans', avatar: '👩', q: '"Bonjour, vous avez des options végétariennes ?"' },
+      { name: 'Pierre, 44 ans', avatar: '👨', q: '"Vous faites des réservations pour ce soir, il reste de la place ?"' },
+      { name: 'Emma, 32 ans', avatar: '👩‍🦰', q: '"Est-ce que vous avez des plats sans gluten ?"' },
+      { name: 'Youssef, 38 ans', avatar: '🧔', q: '"Votre cuisine, elle est halal ?"' },
+      { name: 'Claire, 27 ans', avatar: '👩‍🦱', q: '"Vous livrez à domicile ou c\'est uniquement sur place ?"' },
+      { name: 'Michel, 61 ans', avatar: '👴', q: '"C\'est combien en moyenne pour un repas complet ?"' },
+      { name: 'Anaïs, 35 ans', avatar: '👩', q: '"Mon fils est allergique aux fruits de mer, vous pouvez adapter ?"' },
+      { name: 'Kevin, 23 ans', avatar: '👦', q: '"Vous avez une terrasse ?"' },
+      { name: 'Stéphanie, 41 ans', avatar: '👩‍🦳', q: '"On est un groupe de 12, vous pouvez nous accueillir ?"' },
+      { name: 'Bruno, 55 ans', avatar: '👨‍🦲', q: '"Vous êtes ouverts le dimanche midi ?"' },
+      { name: 'Léonie, 28 ans', avatar: '👩‍🦰', q: '"Vous avez une option vegan ?"' },
+      { name: 'Hassan, 46 ans', avatar: '👨', q: '"C\'est quoi votre spécialité ?"' },
+      { name: 'Marine, 33 ans', avatar: '👩', q: '"Je peux privatiser votre salle pour un anniversaire ?"' },
+      { name: 'Patrick, 58 ans', avatar: '👨‍🦱', q: '"Vous avez un menu enfant ?"' },
+      { name: 'Zoé, 22 ans', avatar: '🧒', q: '"Les chiens sont acceptés chez vous ?"' },
+    ],
+    plombier: [
+      { name: 'Robert, 67 ans', avatar: '👴', q: '"Ma canalisation a éclaté, vous intervenez en urgence ?"' },
+      { name: 'Sandra, 38 ans', avatar: '👩', q: '"C\'est combien pour changer un robinet ?"' },
+      { name: 'François, 52 ans', avatar: '👨', q: '"Vous intervenez le week-end ?"' },
+      { name: 'Martine, 61 ans', avatar: '👩‍🦳', q: '"J\'ai une fuite sous l\'évier, vous pouvez passer aujourd\'hui ?"' },
+      { name: 'Julien, 34 ans', avatar: '👨‍🦱', q: '"Vous faites aussi l\'installation de chauffe-eau ?"' },
+      { name: 'Cécile, 45 ans', avatar: '👩', q: '"Vous donnez des devis gratuits avant d\'intervenir ?"' },
+      { name: 'André, 71 ans', avatar: '👴', q: '"C\'est combien pour déboucher des toilettes ?"' },
+      { name: 'Vanessa, 29 ans', avatar: '👩‍🦰', q: '"Vous travaillez en dehors des heures de bureau ?"' },
+      { name: 'Thierry, 48 ans', avatar: '👨', q: '"Vous faites aussi la salle de bain complète ?"' },
+      { name: 'Nicole, 55 ans', avatar: '👩‍🦳', q: '"Quelle est votre zone d\'intervention ?"' },
+      { name: 'Dylan, 26 ans', avatar: '👦', q: '"Vous pouvez me donner un prix approximatif par téléphone ?"' },
+      { name: 'Élise, 43 ans', avatar: '👩', q: '"Vous êtes disponible demain matin ?"' },
+      { name: 'Bernard, 64 ans', avatar: '👨‍🦲', q: '"Vous faites aussi le remplacement de radiateurs ?"' },
+      { name: 'Aurélie, 37 ans', avatar: '👩‍🦱', q: '"Vous acceptez les chèques ou seulement carte ?"' },
+      { name: 'Gilles, 50 ans', avatar: '👨‍🦳', q: '"Mon compteur tourne alors que tout est fermé, c\'est grave ?"' },
+    ],
+    dentiste: [
+      { name: 'Charlotte, 27 ans', avatar: '👩', q: '"Bonjour, vous prenez de nouveaux patients ?"' },
+      { name: 'Alain, 54 ans', avatar: '👨', q: '"Est-ce que vous êtes conventionné secteur 1 ?"' },
+      { name: 'Pauline, 33 ans', avatar: '👩‍🦱', q: '"J\'ai une rage de dents, vous pouvez me prendre en urgence ?"' },
+      { name: 'Jacques, 69 ans', avatar: '👴', q: '"Vous faites les prothèses dentaires ?"' },
+      { name: 'Amina, 31 ans', avatar: '👩', q: '"C\'est combien un détartrage ?"' },
+      { name: 'Romain, 25 ans', avatar: '👦', q: '"Vous avez de la place cette semaine ?"' },
+      { name: 'Henriette, 74 ans', avatar: '👵', q: '"Vous faites les implants dentaires ?"' },
+      { name: 'Stéphane, 46 ans', avatar: '👨', q: '"Vous prenez la mutuelle directement ?"' },
+      { name: 'Laura, 28 ans', avatar: '👩‍🦰', q: '"Vous faites le blanchiment des dents ?"' },
+      { name: 'Antoine, 39 ans', avatar: '👨‍🦱', q: '"Mon fils a 7 ans, vous voyez les enfants ?"' },
+      { name: 'Sylvie, 58 ans', avatar: '👩‍🦳', q: '"Vous avez un parking ou c\'est difficile de se garer ?"' },
+      { name: 'Mathieu, 42 ans', avatar: '👨', q: '"C\'est possible d\'avoir un rendez-vous le samedi ?"' },
+      { name: 'Brigitte, 63 ans', avatar: '👩', q: '"Vous faites les appareils dentaires ?"' },
+      { name: 'Nicolas, 35 ans', avatar: '👨‍🦱', q: '"Combien de temps dure un bilan de première visite ?"' },
+      { name: 'Manon, 21 ans', avatar: '👩', q: '"Je n\'ai pas de mutuelle, c\'est problématique ?"' },
+    ],
+    immobilier: [
+      { name: 'Vincent, 36 ans', avatar: '👨', q: '"Bonjour, vous avez des appartements à louer dans le quartier ?"' },
+      { name: 'Nadia, 42 ans', avatar: '👩', q: '"Quels sont vos honoraires pour une vente ?"' },
+      { name: 'Bertrand, 55 ans', avatar: '👨‍🦳', q: '"Vous faites aussi les estimations gratuitement ?"' },
+      { name: 'Sandrine, 38 ans', avatar: '👩‍🦱', q: '"J\'ai un appartement à vendre, par où on commence ?"' },
+      { name: 'Guillaume, 31 ans', avatar: '👦', q: '"Vous avez des studios à moins de 1000€ par mois ?"' },
+      { name: 'Isabelle, 47 ans', avatar: '👩', q: '"Est-ce que vous gérez aussi la location ?"' },
+      { name: 'Philippe, 61 ans', avatar: '👨‍🦲', q: '"C\'est quoi le délai moyen pour vendre un bien ?"' },
+      { name: 'Caroline, 34 ans', avatar: '👩‍🦰', q: '"Vous travaillez aussi avec des investisseurs ?"' },
+      { name: 'Alexis, 28 ans', avatar: '👦', q: '"C\'est possible de visiter ce week-end ?"' },
+      { name: 'Monique, 68 ans', avatar: '👵', q: '"Je veux acheter pour ma fille, vous pouvez l\'accompagner ?"' },
+      { name: 'Frédéric, 44 ans', avatar: '👨', q: '"Vous avez des biens avec jardin dans la région ?"' },
+      { name: 'Élodie, 29 ans', avatar: '👩', q: '"Vous faites aussi les baux commerciaux ?"' },
+      { name: 'Jean-Pierre, 72 ans', avatar: '👴', q: '"J\'hérite d\'un appartement, vous pouvez m\'aider à le vendre ?"' },
+      { name: 'Aurélie, 37 ans', avatar: '👩‍🦱', q: '"C\'est quoi les documents à préparer pour mettre en vente ?"' },
+      { name: 'Luc, 53 ans', avatar: '👨‍🦱', q: '"Vous faites des photos professionnelles pour les annonces ?"' },
+    ],
+    esthetique: [
+      { name: 'Océane, 24 ans', avatar: '👩', q: '"Bonjour, vous faites les ongles en gel ?"' },
+      { name: 'Brigitte, 57 ans', avatar: '👩‍🦳', q: '"C\'est combien une épilation complète ?"' },
+      { name: 'Yasmine, 31 ans', avatar: '👩‍🦱', q: '"Vous avez de la place cette semaine pour un soin du visage ?"' },
+      { name: 'Léa, 19 ans', avatar: '🧒', q: '"Vous faites la pose de cils ?"' },
+      { name: 'Patricia, 48 ans', avatar: '👩', q: '"C\'est combien pour un massage relaxant ?"' },
+      { name: 'Inès, 27 ans', avatar: '👩‍🦰', q: '"Vous faites le rehaussement de cils ?"' },
+      { name: 'Dominique, 54 ans', avatar: '👩‍🦳', q: '"Vous avez des soins anti-âge ?"' },
+      { name: 'Chloé, 23 ans', avatar: '👩', q: '"C\'est combien pour une manucure simple ?"' },
+      { name: 'Valérie, 42 ans', avatar: '👩‍🦱', q: '"Vous faites la cire pour les sourcils ?"' },
+      { name: 'Émilie, 35 ans', avatar: '👩‍🦰', q: '"C\'est possible d\'avoir un rendez-vous un samedi ?"' },
+      { name: 'Lucie, 29 ans', avatar: '👩', q: '"Vous utilisez des produits bio ?"' },
+      { name: 'Catherine, 51 ans', avatar: '👩‍🦳', q: '"Vous faites des forfaits mariée ?"' },
+      { name: 'Margot, 22 ans', avatar: '👩', q: '"C\'est quoi votre tarif pour une épilation du maillot ?"' },
+      { name: 'Stéphanie, 38 ans', avatar: '👩‍🦱', q: '"Vous faites aussi le maquillage permanent ?"' },
+      { name: 'Florence, 45 ans', avatar: '👩', q: '"Il faut prendre rendez-vous longtemps à l\'avance ?"' },
+    ],
+  };
+
+  /* ── STATE ── */
+  let currentScreen = 0;
+  let selectedSector = null;
+  let currentQ = 0;
+  let isRecording = false;
+  let recordInterval = null;
+  let recordSeconds = 0;
+  let answeredQuestions = 0;
+
+  const TOTAL_Q = 15;
+  const stepLabels = ['Consentement', 'Secteur', 'Briefing', 'Session', 'Traitement', 'Votre double'];
+
+  /* ── NAVIGATION ── */
+  function goTo(n) {
+    document.getElementById('s' + currentScreen).classList.remove('active');
+    currentScreen = n;
+    document.getElementById('s' + n).classList.add('active');
+    document.getElementById('step-counter').textContent = `Étape ${n + 1} / 5`;
+    window.scrollTo(0, 0);
+  }
+
+  /* ── CONSENT ── */
+  function checkConsent() {
+    const all = ['c1','c2','c3'].every(id => document.getElementById(id).checked);
+    document.getElementById('consent-btn').disabled = !all;
+  }
+
+  /* ── SECTOR ── */
+  function selectSector(s, el) {
+    document.querySelectorAll('.sector-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedSector = s;
+    document.getElementById('sector-btn').disabled = false;
+  }
+
+  /* ── SESSION ── */
+  function startSession() {
+    goTo(3);
+    currentQ = 0;
+    answeredQuestions = 0;
+    loadQuestion(0);
+  }
+
+  function loadQuestion(idx) {
+    const qs = questions[selectedSector] || questions.coiffeur;
+    const q = qs[idx];
+    document.getElementById('c-avatar').textContent = q.avatar;
+    document.getElementById('c-name').textContent = q.name;
+    document.getElementById('q-text').textContent = q.q;
+    document.getElementById('q-counter').textContent = `Question ${idx + 1} / ${TOTAL_Q}`;
+    const pct = Math.round((idx / TOTAL_Q) * 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('clone-pct').textContent = pct + '%';
+    document.getElementById('clone-mini-fill').style.width = pct + '%';
+    document.getElementById('btn-next').classList.remove('visible');
+    document.getElementById('record-status').textContent = 'Prêt à enregistrer';
+    document.getElementById('record-status').classList.remove('active');
+    document.getElementById('record-timer').textContent = '';
+    document.getElementById('record-btn').classList.remove('recording');
+    document.getElementById('record-btn').textContent = '🎙️';
+
+    // Re-animate customer card
+    const card = document.getElementById('customer-card');
+    card.style.animation = 'none';
+    void card.offsetWidth;
+    card.style.animation = '';
+  }
+
+  function toggleRecord() {
+    if (!isRecording) {
+      startRecording();
+    } else {
+      stopRecording();
+    }
+  }
+
+  function startRecording() {
+    isRecording = true;
+    recordSeconds = 0;
+    document.getElementById('record-btn').classList.add('recording');
+    document.getElementById('record-btn').textContent = '⏹';
+    document.getElementById('record-status').textContent = 'Enregistrement en cours…';
+    document.getElementById('record-status').classList.add('active');
+
+    recordInterval = setInterval(() => {
+      recordSeconds++;
+      const m = Math.floor(recordSeconds / 60);
+      const s = recordSeconds % 60;
+      document.getElementById('record-timer').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+
+      if (recordSeconds >= 3) {
+        document.getElementById('btn-next').classList.add('visible');
+      }
+    }, 1000);
+  }
+
+  function stopRecording() {
+    isRecording = false;
+    clearInterval(recordInterval);
+    document.getElementById('record-btn').classList.remove('recording');
+    document.getElementById('record-btn').textContent = '✓';
+    document.getElementById('record-status').textContent = 'Réponse enregistrée ✓';
+    document.getElementById('record-status').classList.remove('active');
+    document.getElementById('record-status').style.color = 'var(--green)';
+    document.getElementById('btn-next').classList.add('visible');
+  }
+
+  function nextQuestion() {
+    if (isRecording) stopRecording();
+    answeredQuestions++;
+    currentQ++;
+
+    if (currentQ >= TOTAL_Q) {
+      goTo(4);
+      runProcessing();
+      return;
+    }
+
+    document.getElementById('record-status').style.color = '';
+    loadQuestion(currentQ);
+  }
+
+  function skipQuestion() {
+    if (isRecording) stopRecording();
+    currentQ++;
+    if (currentQ >= TOTAL_Q) {
+      goTo(4);
+      runProcessing();
+      return;
+    }
+    document.getElementById('record-status').style.color = '';
+    loadQuestion(currentQ);
+  }
+
+  /* ── PROCESSING ── */
+  function runProcessing() {
+    const steps = ['p1','p2','p3','p4'];
+    let i = 0;
+
+    const advance = () => {
+      if (i > 0) {
+        document.getElementById(steps[i-1]).classList.remove('active');
+        document.getElementById(steps[i-1]).classList.add('done');
+        document.getElementById(steps[i-1]).querySelector('.proc-icon').textContent = '✅';
+      }
+      if (i < steps.length) {
+        document.getElementById(steps[i]).classList.add('active');
+        i++;
+        setTimeout(advance, 1800);
+      } else {
+        setTimeout(() => goTo(5), 800);
+      }
+    };
+    advance();
+  }
+
+  /* ── REVEAL ── */
+  function playDemo() {
+    const btn = document.querySelector('.play-btn');
+    btn.style.borderColor = 'var(--green)';
+    btn.style.background = 'var(--green-light)';
+    const icon = btn.querySelector('.play-icon');
+    icon.textContent = '⏸';
+    setTimeout(() => {
+      icon.textContent = '▶';
+      btn.style.borderColor = '';
+      btn.style.background = '';
+    }, 4000);
+  }
+</script>
+</body>
+</html>
